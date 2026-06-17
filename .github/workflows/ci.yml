@@ -19,6 +19,7 @@ jobs:
               with:
                   php-version: ${{ matrix.php }}
                   coverage: none
+                  extensions: zip
             - run: composer install --prefer-dist --no-progress
             - run: composer test
 
@@ -30,6 +31,7 @@ jobs:
               with:
                   php-version: '8.3'
                   coverage: none
+                  extensions: zip
             - run: composer install --prefer-dist --no-progress
             - run: composer phpstan
 
@@ -41,5 +43,6 @@ jobs:
               with:
                   php-version: '8.3'
                   coverage: none
+                  extensions: zip
             - run: composer install --prefer-dist --no-progress
             - run: composer lint

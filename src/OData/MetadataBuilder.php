@@ -10,11 +10,9 @@ final class MetadataBuilder
 {
     private const NAMESPACE_NAME = 'WPDev.PhpSpreadsheetOData';
 
-    /** @var Spreadsheet */
-    private $spreadsheet;
+    private Spreadsheet $spreadsheet;
 
-    /** @var EntitySetBuilder */
-    private $entitySetBuilder;
+    private EntitySetBuilder $entitySetBuilder;
 
     public function __construct(Spreadsheet $spreadsheet, EntitySetBuilder $entitySetBuilder)
     {

@@ -139,5 +139,6 @@ final class FeedRoutingTest extends TestCase
         $this->assertCount(2, $body['value']);
         $this->assertSame('tenant-a', $body['value'][0]['name']);
         $this->assertSame('Feed', $body['value'][0]['kind']);
+        $this->assertArrayNotHasKey('@odata.context', $body);
     }
 }

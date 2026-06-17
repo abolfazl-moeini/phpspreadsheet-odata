@@ -11,8 +11,7 @@ use WPDev\PhpSpreadsheetOData\Support\WorksheetCells;
 
 final class EntitySetBuilder
 {
-    /** @var Spreadsheet */
-    private $spreadsheet;
+    private Spreadsheet $spreadsheet;
 
     public function __construct(Spreadsheet $spreadsheet)
     {

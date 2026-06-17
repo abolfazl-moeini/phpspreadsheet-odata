@@ -18,23 +18,17 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class ODataServer
 {
-    /** @var AuthenticatorInterface|null */
-    private $authenticator = null;
+    private ?AuthenticatorInterface $authenticator = null;
 
-    /** @var FeedResolverInterface */
-    private $feedResolver;
+    private FeedResolverInterface $feedResolver;
 
-    /** @var Spreadsheet|null */
-    private $legacySpreadsheet;
+    private ?Spreadsheet $legacySpreadsheet;
 
-    /** @var string */
-    private $serviceRoot;
+    private string $serviceRoot;
 
-    /** @var QueryHandlerInterface */
-    private $queryProcessor;
+    private QueryHandlerInterface $queryProcessor;
 
-    /** @var Router */
-    private $router;
+    private Router $router;
 
     /**
      * @param FeedResolverInterface|Spreadsheet $dataSource

@@ -71,4 +71,18 @@ final class ResponseFormatterTest extends TestCase
         $this->assertSame('Products', $decoded['value'][1]['name']);
         $this->assertSame('EntitySet', $decoded['value'][0]['kind']);
     }
+
+    #[Test]
+    public function it_formats_feed_service_document_without_metadata_context(): void
+    {
+        $formatter = new ResponseFormatter('http://localhost/odata');
+        $payload = $formatter->formatFeedServiceDocument(['tenant-a', 'tenant-b']);
+
+        /** @var array{value: list<array<string, mixed>>} $decoded */
+        $decoded = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertArrayNotHasKey('@odata.context', $decoded);
+        $this->assertSame('tenant-a', $decoded['value'][0]['name']);
+        $this->assertSame('Feed', $decoded['value'][0]['kind']);
+    }
 }

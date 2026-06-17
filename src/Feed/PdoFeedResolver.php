@@ -10,14 +10,11 @@ use WPDev\PhpSpreadsheetOData\Contracts\FeedResolverInterface;
 
 final class PdoFeedResolver implements FeedResolverInterface
 {
-    /** @var PDO */
-    private $pdo;
+    private PDO $pdo;
 
-    /** @var string */
-    private $tableName;
+    private string $tableName;
 
-    /** @var callable */
-    private $loader;
+    private mixed $loader;
 
     /**
      * @param callable(string): ?Spreadsheet $loader

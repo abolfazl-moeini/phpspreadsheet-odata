@@ -6,8 +6,7 @@ namespace WPDev\PhpSpreadsheetOData\OData;
 
 final class ResponseFormatter
 {
-    /** @var string */
-    private $serviceRoot;
+    private string $serviceRoot;
 
     public function __construct(string $serviceRoot)
     {
@@ -71,7 +70,6 @@ final class ResponseFormatter
     public function formatFeedServiceDocument(array $feedIds): string
     {
         $payload = [
-            '@odata.context' => $this->serviceRoot . '/$metadata',
             'value' => array_map(
                 static function (string $feedId): array {
                     return [

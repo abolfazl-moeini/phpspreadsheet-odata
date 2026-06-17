@@ -69,6 +69,37 @@ final class ODataServerTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_only_selected_fields_on_entity_endpoint(): void
+    {
+        $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
+        $request = (new ServerRequest('GET', '/odata/Employees(1)'))
+            ->withQueryParams(['$select' => 'Name']);
+        $response = $server->handle($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        /** @var array<string, mixed> $body */
+        $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('Alice', $body['Name']);
+        $this->assertArrayNotHasKey('Age', $body);
+        $this->assertArrayNotHasKey('Id', $body);
+        $this->assertArrayNotHasKey('RowIndex', $body);
+        $this->assertArrayHasKey('@odata.context', $body);
+    }
+
+    #[Test]
+    public function it_returns_404_for_out_of_range_entity_key(): void
+    {
+        $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
+        $request = new ServerRequest('GET', '/odata/Employees(999)');
+        $response = $server->handle($request);
+
+        $this->assertSame(404, $response->getStatusCode());
+        /** @var array{error: array{code: string, message: string}} $body */
+        $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('404', $body['error']['code']);
+    }
+
+    #[Test]
     public function it_includes_www_authenticate_for_basic_auth_failures(): void
     {
         $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');

@@ -10,7 +10,7 @@ use WPDev\PhpSpreadsheetOData\Contracts\FeedResolverInterface;
 final class InMemoryFeedResolver implements FeedResolverInterface
 {
     /** @var array<string, Spreadsheet> */
-    private $feeds;
+    private array $feeds;
 
     /**
      * @param array<string, Spreadsheet> $feeds
@@ -30,6 +30,12 @@ final class InMemoryFeedResolver implements FeedResolverInterface
      */
     public function listFeedIds(): array
     {
-        return array_keys($this->feeds);
+        $feedIds = [];
+
+        foreach (array_keys($this->feeds) as $feedId) {
+            $feedIds[] = $feedId;
+        }
+
+        return $feedIds;
     }
 }

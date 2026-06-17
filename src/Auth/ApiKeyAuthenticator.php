@@ -9,11 +9,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class ApiKeyAuthenticator implements AuthenticatorInterface
 {
-    /** @var string */
-    private $headerName;
+    private string $headerName;
 
-    /** @var callable */
-    private $validator;
+    private mixed $validator;
 
     /**
      * @param callable(string): bool $validator

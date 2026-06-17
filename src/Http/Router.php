@@ -14,8 +14,7 @@ final class Router
     public const ROUTE_ENTITY = 'entity';
     public const ROUTE_NOT_FOUND = 'not_found';
 
-    /** @var string */
-    private $basePath;
+    private string $basePath;
 
     public function __construct(string $basePath)
     {

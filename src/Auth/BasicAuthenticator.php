@@ -10,8 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class BasicAuthenticator implements AuthenticatorInterface
 {
-    /** @var callable */
-    private $validator;
+    private mixed $validator;
 
     /**
      * @param callable(string, string): bool $validator

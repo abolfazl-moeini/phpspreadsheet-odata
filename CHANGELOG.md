@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `FeedResolverInterface` with `InMemoryFeedResolver` and `PdoFeedResolver`
 - Bearer, API Key, and Basic authentication
 - OData query options: `$filter`, `$select`, `$top`, `$skip`, `$count`, `$orderby`
-- PHP 7.4+ compatibility helpers (`Support\Str`, `Support\WorksheetCells`)
+- PhpSpreadsheet v2/v3 API-compatibility helpers (`Support\Str`, `Support\WorksheetCells`)
 - PHPUnit test suite, PHPStan configuration, and GitHub Actions CI
 
 ### Security

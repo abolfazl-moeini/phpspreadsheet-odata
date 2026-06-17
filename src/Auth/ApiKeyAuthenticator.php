@@ -11,7 +11,8 @@ final class ApiKeyAuthenticator implements AuthenticatorInterface
 {
     private string $headerName;
 
-    private mixed $validator;
+    /** @var callable */
+    private $validator;
 
     /**
      * @param callable(string): bool $validator

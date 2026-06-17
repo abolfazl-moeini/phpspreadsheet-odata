@@ -14,7 +14,8 @@ final class PdoFeedResolver implements FeedResolverInterface
 
     private string $tableName;
 
-    private mixed $loader;
+    /** @var callable */
+    private $loader;
 
     /**
      * @param callable(string): ?Spreadsheet $loader

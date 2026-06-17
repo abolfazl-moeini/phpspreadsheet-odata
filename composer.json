@@ -3,7 +3,7 @@
     "description": "Framework-agnostic OData v4 read-only feed for PhpSpreadsheet workbooks",
     "type": "library",
     "version": "1.0.0",
-    "license": "MIT",
+    "license": "GPL-2.0-or-later",
     "keywords": [
         "odata",
         "odata-v4",

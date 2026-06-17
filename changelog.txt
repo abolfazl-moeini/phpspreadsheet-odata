@@ -1,0 +1,37 @@
+CHANGELOG — wpdev/phpspreadsheet-odata
+======================================
+
+Format: Keep a Changelog (plain text)
+Versioning: Semantic Versioning (https://semver.org)
+
+
+[1.0.1] - 2026-06-17
+--------------------
+
+Changed
+  - License changed from MIT to GNU General Public License v2.0 or later
+    (GPL-2.0-or-later)
+
+
+[1.0.0] - 2026-06-17
+--------------------
+
+Added
+  - OData v4 read-only server over PhpSpreadsheet workbooks (PSR-7)
+  - Single-feed and multi-feed (feedId) routing
+  - FeedResolverInterface with InMemoryFeedResolver and PdoFeedResolver
+  - Bearer, API Key, and Basic authentication
+  - OData query options: $filter, $select, $top, $skip, $count, $orderby
+  - PhpSpreadsheet v2/v3 API-compatibility helpers (Support\Str, Support\WorksheetCells)
+  - PHPUnit test suite, PHPStan configuration, and GitHub Actions CI
+
+Security
+  - Query limits for $top (1000) and $skip (100000)
+  - OData-shaped error responses; uncaught exceptions return generic 500
+  - WWW-Authenticate challenge headers for Basic/Bearer auth failures
+
+Requirements
+  - PHP >= 7.4
+  - phpoffice/phpspreadsheet ^1.29
+  - psr/http-message ^1.0|^2.0
+  - guzzlehttp/psr7 ^2.0

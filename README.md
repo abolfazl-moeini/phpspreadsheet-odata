@@ -170,13 +170,22 @@ src/
 - `ResponseFormatter` — formats OData JSON responses
 - `Router` — routes requests to handlers (with optional `feedId` segment)
 
-## Testing
+## Production deployment
+
+- Set `serviceRoot` to the public URL of your OData endpoint (no trailing slash required).
+- Enable authentication before exposing feeds to the internet.
+- Use HTTPS via your web server or reverse proxy.
+- For multi-tenant setups, implement `FeedResolverInterface` to load workbooks from your storage layer.
+- Query limits are enforced: `$top` ≤ 1000, `$skip` ≤ 100000.
+
+## Development
 
 ```bash
 composer install
-./vendor/bin/phpunit
+composer test
+composer phpstan
 ```
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

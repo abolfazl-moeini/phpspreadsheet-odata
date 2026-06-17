@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\OData;
 
-use GuzzleHttp\Psr7\Response;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use WPDev\PhpSpreadsheetOData\Auth\ApiKeyAuthenticator;
 use WPDev\PhpSpreadsheetOData\Auth\BasicAuthenticator;
@@ -55,9 +54,9 @@ final class ODataServer
             throw new \InvalidArgumentException('Data source must be a Spreadsheet or FeedResolverInterface.');
         }
 
-        $this->serviceRoot = $serviceRoot;
+        $this->serviceRoot = rtrim($serviceRoot, '/');
         $this->queryProcessor = $queryProcessor ?? new QueryProcessor();
-        $this->router = new Router($this->extractBasePath($serviceRoot));
+        $this->router = new Router($this->extractBasePath($this->serviceRoot));
     }
 
     /**
@@ -93,25 +92,13 @@ final class ODataServer
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (strtoupper($request->getMethod()) !== 'GET') {
-            return new Response(405, [
-                'Content-Type' => 'application/json',
+            return ODataError::json(405, '405', 'Method Not Allowed', [
                 'Allow' => 'GET',
-                'OData-Version' => '4.0',
-            ], json_encode([
-                'error' => [
-                    'code' => '405',
-                    'message' => 'Method Not Allowed',
-                ],
-            ], JSON_THROW_ON_ERROR));
+            ]);
         }
 
         if ($this->authenticator !== null && !$this->authenticator->authenticate($request)) {
-            return new Response(401, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], json_encode([
-                'error' => [
-                    'code' => '401',
-                    'message' => 'Unauthorized',
-                ],
-            ], JSON_THROW_ON_ERROR));
+            return ODataError::json(401, '401', 'Unauthorized', $this->authChallengeHeaders());
         }
 
         try {
@@ -135,6 +122,7 @@ final class ODataServer
                     return $this->metadataResponse($context);
                 case Router::ROUTE_COLLECTION:
                     $entitySet = EntitySetBuilder::normalizeIdentifier($route['entitySet'] ?? '');
+
                     return $this->collectionResponse(
                         $context,
                         $entitySet,
@@ -142,6 +130,7 @@ final class ODataServer
                     );
                 case Router::ROUTE_ENTITY:
                     $entitySet = EntitySetBuilder::normalizeIdentifier($route['entitySet'] ?? '');
+
                     return $this->entityResponse(
                         $context,
                         $entitySet,
@@ -152,12 +141,9 @@ final class ODataServer
                     return $this->notFoundResponse();
             }
         } catch (\InvalidArgumentException $e) {
-            return new Response(400, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], json_encode([
-                'error' => [
-                    'code' => '400',
-                    'message' => $e->getMessage(),
-                ],
-            ], JSON_THROW_ON_ERROR));
+            return ODataError::json(400, '400', $e->getMessage());
+        } catch (\Throwable $e) {
+            return ODataError::json(500, '500', 'Internal Server Error');
         }
     }
 
@@ -173,23 +159,18 @@ final class ODataServer
                 $context->entitySetBuilder->getEntitySetNames()
             );
 
-            return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
+            return $this->jsonResponse(200, $body);
         }
 
-        // For resolver-backed usage, list available feeds at the root service document.
         $formatter = new ResponseFormatter($this->serviceRoot);
         $body = $formatter->formatFeedServiceDocument($this->feedResolver->listFeedIds());
 
-        return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
+        return $this->jsonResponse(200, $body);
     }
 
     private function metadataResponse(FeedContext $context): ResponseInterface
     {
-        return new Response(
-            200,
-            ['Content-Type' => 'application/xml', 'OData-Version' => '4.0'],
-            $context->metadataBuilder->build()
-        );
+        return $this->xmlResponse(200, $context->metadataBuilder->build());
     }
 
     /**
@@ -213,7 +194,7 @@ final class ODataServer
             $result['count']
         );
 
-        return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
+        return $this->jsonResponse(200, $body);
     }
 
     /**
@@ -243,7 +224,7 @@ final class ODataServer
 
         $body = $context->responseFormatter->formatEntity($entitySetName, $entity);
 
-        return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
+        return $this->jsonResponse(200, $body);
     }
 
     private function resolveSpreadsheet(?string $feedId): ?Spreadsheet
@@ -260,7 +241,7 @@ final class ODataServer
         $scopedServiceRoot = $this->serviceRoot;
 
         if ($feedId !== null) {
-            $scopedServiceRoot = rtrim($this->serviceRoot, '/') . '/' . rawurlencode($feedId);
+            $scopedServiceRoot = $this->serviceRoot . '/' . rawurlencode($feedId);
         }
 
         $entitySetBuilder = new EntitySetBuilder($spreadsheet);
@@ -274,12 +255,33 @@ final class ODataServer
 
     private function notFoundResponse(): ResponseInterface
     {
-        return new Response(404, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], json_encode([
-            'error' => [
-                'code' => '404',
-                'message' => 'Not Found',
-            ],
-        ], JSON_THROW_ON_ERROR));
+        return ODataError::json(404, '404', 'Not Found');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function authChallengeHeaders(): array
+    {
+        if ($this->authenticator instanceof BasicAuthenticator) {
+            return ['WWW-Authenticate' => 'Basic realm="OData"'];
+        }
+
+        if ($this->authenticator instanceof BearerAuthenticator) {
+            return ['WWW-Authenticate' => 'Bearer realm="OData"'];
+        }
+
+        return [];
+    }
+
+    private function jsonResponse(int $status, string $body): ResponseInterface
+    {
+        return ODataError::withBody($status, 'application/json', $body);
+    }
+
+    private function xmlResponse(int $status, string $body): ResponseInterface
+    {
+        return ODataError::withBody($status, 'application/xml', $body);
     }
 
     private function extractBasePath(string $serviceRoot): string

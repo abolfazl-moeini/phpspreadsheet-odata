@@ -9,6 +9,9 @@ use WPDev\PhpSpreadsheetOData\Support\Str;
 
 final class QueryProcessor implements QueryHandlerInterface
 {
+    private const MAX_TOP = 1000;
+
+    private const MAX_SKIP = 100000;
     /**
      * @param list<array<string, mixed>> $entities
      * @param array<string, string> $queryParams
@@ -43,7 +46,14 @@ final class QueryProcessor implements QueryHandlerInterface
             if (!preg_match('/^\d+$/', $skip)) {
                 throw new \InvalidArgumentException('The $skip query option must be a non-negative integer.');
             }
-            $result = array_slice($result, (int) $skip);
+            $skipValue = (int) $skip;
+            if ($skipValue > self::MAX_SKIP) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The $skip query option must not exceed %d.',
+                    self::MAX_SKIP
+                ));
+            }
+            $result = array_slice($result, $skipValue);
         }
 
         if (isset($queryParams['$top'])) {
@@ -51,7 +61,14 @@ final class QueryProcessor implements QueryHandlerInterface
             if (!preg_match('/^\d+$/', $top)) {
                 throw new \InvalidArgumentException('The $top query option must be a non-negative integer.');
             }
-            $result = array_slice($result, 0, (int) $top);
+            $topValue = (int) $top;
+            if ($topValue > self::MAX_TOP) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The $top query option must not exceed %d.',
+                    self::MAX_TOP
+                ));
+            }
+            $result = array_slice($result, 0, $topValue);
         }
 
         if (isset($queryParams['$select'])) {

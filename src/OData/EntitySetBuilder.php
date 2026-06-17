@@ -76,19 +76,7 @@ final class EntitySetBuilder
         $highestRow = $worksheet->getHighestDataRow();
 
         for ($row = 2; $row <= $highestRow; ++$row) {
-            $entity = ['RowIndex' => $row - 1];
-
-            foreach ($headerMap as $col => $header) {
-                $cell = WorksheetCells::getCell($worksheet, $col, $row);
-                try {
-                    $value = $cell->getCalculatedValue();
-                } catch (\Throwable $e) {
-                    $value = $cell->getValue();
-                }
-                $entity[$header] = $this->normalizeValue($value);
-            }
-
-            $entities[] = $entity;
+            $entities[] = $this->buildEntityFromRow($worksheet, $headerMap, $row);
         }
 
         return $entities;
@@ -99,14 +87,26 @@ final class EntitySetBuilder
      */
     public function findByKey(string $sheetName, int $key): ?array
     {
-        foreach ($this->build($sheetName) as $entity) {
-            $rowIndex = $entity['RowIndex'] ?? null;
-            if (is_numeric($rowIndex) && (int) $rowIndex === $key) {
-                return $entity;
-            }
+        if ($key < 1) {
+            return null;
         }
 
-        return null;
+        $worksheet = $this->findWorksheet($sheetName);
+        if ($worksheet === null) {
+            return null;
+        }
+
+        $headerMap = $this->extractHeaderMap($worksheet);
+        if ($headerMap === []) {
+            return null;
+        }
+
+        $row = $key + 1;
+        if ($row > $worksheet->getHighestDataRow()) {
+            return null;
+        }
+
+        return $this->buildEntityFromRow($worksheet, $headerMap, $row);
     }
 
     /**
@@ -183,6 +183,27 @@ final class EntitySetBuilder
         }
 
         return $map;
+    }
+
+    /**
+     * @param array<int, string> $headerMap
+     * @return array<string, mixed>
+     */
+    private function buildEntityFromRow(Worksheet $worksheet, array $headerMap, int $row): array
+    {
+        $entity = ['RowIndex' => $row - 1];
+
+        foreach ($headerMap as $col => $header) {
+            $cell = WorksheetCells::getCell($worksheet, $col, $row);
+            try {
+                $value = $cell->getCalculatedValue();
+            } catch (\Throwable $e) {
+                $value = $cell->getValue();
+            }
+            $entity[$header] = $this->normalizeValue($value);
+        }
+
+        return $entity;
     }
 
     /**

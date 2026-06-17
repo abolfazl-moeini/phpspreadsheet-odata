@@ -16,7 +16,7 @@ No framework dependencies (Laravel, Symfony, etc.). Uses **PSR-7** request/respo
 
 | Area | Rule |
 |------|------|
-| PHP | `^7.4\|^8.0` — **no PHP 8-only syntax** in `src/` (`readonly`, `match`, union types, `mixed` hints, `str_*` polyfills needed) |
+| PHP | `>=7.4` — **no PHP 8-only syntax** in `src/` (`readonly`, `match`, union types, `mixed` hints, `str_*` polyfills needed) |
 | Style | PSR-4 autoloading, PSR-12, `declare(strict_types=1)` |
 | HTTP | PSR-7 only; Guzzle PSR-7 used for responses |
 | Database | Core is **database-agnostic**; optional `PdoFeedResolver` is an example only |
@@ -137,6 +137,7 @@ Only one authenticator active at a time (last call wins).
 ```php
 interface FeedResolverInterface {
     public function resolve(string $feedId): ?Spreadsheet;
+    public function listFeedIds(): array;
 }
 ```
 
@@ -214,11 +215,19 @@ tests/
 | Standalone demo | `public/index.php` |
 | User docs | `README.md` |
 
+## Error handling
+
+- `ODataError` centralizes JSON/XML success and error responses.
+- `InvalidArgumentException` (bad query syntax) → HTTP 400.
+- Uncaught `\Throwable` → HTTP 500 with generic message (no stack traces leaked).
+- `serviceRoot` is normalized (`rtrim` trailing slash) in `ODataServer` constructor.
+
 ## Local development
 
 ```bash
 composer install
-./vendor/bin/phpunit
+composer test
+composer phpstan
 php -S localhost:8080 -t public
 ```
 

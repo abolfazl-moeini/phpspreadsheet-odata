@@ -62,9 +62,10 @@ final class PdoFeedResolver implements FeedResolverInterface
             return [];
         }
 
+        /** @var list<string>|false $rows */
         $rows = $statement->fetchAll(PDO::FETCH_COLUMN);
 
-        return $rows !== false ? array_map('strval', $rows) : [];
+        return $rows === false ? [] : array_map('strval', $rows);
     }
 
     public static function createTable(PDO $pdo, string $tableName = 'odata_feeds'): void

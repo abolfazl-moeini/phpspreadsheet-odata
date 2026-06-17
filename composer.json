@@ -3,6 +3,21 @@
     "description": "Framework-agnostic OData v4 read-only feed for PhpSpreadsheet workbooks",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "odata",
+        "odata-v4",
+        "phpspreadsheet",
+        "excel",
+        "spreadsheet",
+        "psr-7",
+        "rest-api"
+    ],
+    "authors": [
+        {
+            "name": "WPDev",
+            "homepage": "https://github.com/wpdev"
+        }
+    ],
     "require": {
         "php": ">=7.4",
         "phpoffice/phpspreadsheet": "^1.29|^2.0|^3.0|^4.0|^5.0",
@@ -22,6 +37,13 @@
         "psr-4": {
             "WPDev\\PhpSpreadsheetOData\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse --memory-limit=512M"
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true

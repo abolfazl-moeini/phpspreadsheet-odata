@@ -147,7 +147,15 @@ $server->useApiKey('X-API-Key', fn ($key) => $key === 'my-key');
 $server->useBasicAuth(fn ($user, $pass) => $user === 'admin' && $pass === 'pass');
 ```
 
-Invalid or missing credentials return `401 Unauthorized`.
+Invalid or missing credentials return `401 Unauthorized` with a `WWW-Authenticate` challenge header (`Basic realm="OData"` or `Bearer realm="OData"`).
+
+### Excel credential prompt
+
+When paired with `wpdev/odata-feed`, the workbook stores only the OData URL — no password in the file. On **Data → Refresh All**, Power Query requests `$metadata` first; a `401` with `WWW-Authenticate: Basic` triggers Excel's native username/password dialog. Credentials are saved in the OS credential store (Keychain on macOS), keyed by the data source URL.
+
+If a feed was previously refreshed anonymously, clear or edit stored credentials via **Data → Get Data → Data Source Settings → Edit Permissions**.
+
+Use HTTPS in production when enabling Basic auth.
 
 ## Architecture
 

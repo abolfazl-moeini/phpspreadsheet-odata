@@ -6,7 +6,7 @@ This document gives AI agents enough background to work on this codebase without
 
 **Package:** `wpdev/phpspreadsheet-odata`  
 **Namespace:** `WPDev\PhpSpreadsheetOData`  
-**PHP:** **minimum 8.1** (`composer.json`: `"php": ">=8.1"`).  
+**PHP:** **minimum 7.4** (`composer.json`: `"php": ">=7.4"`).  
 **Purpose:** Framework-agnostic, read-only **OData v4** HTTP feed over [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) workbooks.
 
 Core idea: pass a `Spreadsheet` (or resolve one per feed) — each worksheet becomes an OData entity set; row 1 is headers; data rows become entities with synthetic key `RowIndex` (1-based, excluding header).
@@ -17,7 +17,7 @@ No framework dependencies (Laravel, Symfony, etc.). Uses **PSR-7** request/respo
 
 | Area | Rule |
 |------|------|
-| PHP | **Minimum 8.1** — hard requirement. CI tests PHP 8.1–8.4. |
+| PHP | **Minimum 7.4** — hard requirement. CI tests PHP 7.4 and 8.1–8.4. |
 | Style | PSR-4 autoloading, PSR-12, `declare(strict_types=1)` |
 | HTTP | PSR-7 only; Guzzle PSR-7 used for responses |
 | Database | Core is **database-agnostic**; optional `PdoFeedResolver` is an example only |
@@ -178,7 +178,7 @@ tests/
 └── OData/          — MetadataBuilder, EntitySetBuilder, QueryProcessor, ResponseFormatter
 ```
 
-## PHP 8.1+ and PhpSpreadsheet
+## PHP 7.4+ and PhpSpreadsheet
 
 Before finishing any task, verify:
 
@@ -195,7 +195,7 @@ Before finishing any task, verify:
 **Do:**
 
 - Keep changes focused; match existing naming and patterns
-- Target PHP 8.1+ per `composer.json`
+- Target PHP 7.4+ per `composer.json`
 - Maintain backward compatibility for Phase 1 routes (spreadsheet constructor)
 - Keep core free of framework/DB dependencies
 - Add PHPUnit tests for new behavior
@@ -206,7 +206,7 @@ Before finishing any task, verify:
 - Add write operations (POST/PATCH/DELETE) unless explicitly requested
 - Require a database in core
 - Break `feedId`-optional routing for legacy single-spreadsheet usage
-- Bump `composer.json` `"php"` constraint below `>=8.1` without explicit user approval
+- Bump `composer.json` `"php"` constraint below `>=7.4` without explicit user approval
 - Redefine data separately from PhpSpreadsheet — always read from workbook structure
 
 ## Key files for common tasks

@@ -6,7 +6,7 @@ Framework-agnostic OData v4 read-only HTTP feed over PhpSpreadsheet workbooks.
 
 | Area | Target |
 |------|--------|
-| PHP | **>= 8.1** |
+| PHP | **>= 7.4** |
 | HTTP | PSR-7 only (`ODataServer::handle`) |
 | OData | v4 read-only; `OData-Version: 4.0` header |
 | Methods | GET only |

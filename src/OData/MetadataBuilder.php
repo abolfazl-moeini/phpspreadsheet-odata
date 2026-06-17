@@ -69,7 +69,7 @@ XML;
     {
         $propertyXml = '<Property Name="RowIndex" Type="Edm.Int32" Nullable="false" />';
 
-        $sample = $this->getFirstDataRowSample($sheetName);
+        $sample = $this->getDataRowSample($sheetName);
 
         foreach ($properties as $property) {
             $type = $this->inferEdmType($sample[$property] ?? null);
@@ -90,12 +90,22 @@ XML;
     /**
      * @return array<string, mixed>
      */
-    private function getFirstDataRowSample(string $sheetName): array
+    private function getDataRowSample(string $sheetName): array
     {
         try {
             $entities = $this->entitySetBuilder->build($sheetName);
+            $sample = [];
+            $limit = min(10, count($entities));
 
-            return $entities[0] ?? [];
+            for ($i = 0; $i < $limit; ++$i) {
+                foreach ($entities[$i] as $property => $value) {
+                    if ($value !== null && !array_key_exists($property, $sample)) {
+                        $sample[$property] = $value;
+                    }
+                }
+            }
+
+            return $sample;
         } catch (\Throwable $e) {
             return [];
         }

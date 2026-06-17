@@ -24,12 +24,7 @@ final class ODataError
                 'code' => $code,
                 'message' => $message,
             ],
-        ]);
-
-        if ($body === false) {
-            $body = '{"error":{"code":"500","message":"Internal Server Error"}}';
-            $status = 500;
-        }
+        ], JSON_THROW_ON_ERROR);
 
         return new Response($status, $headers, $body);
     }

@@ -36,4 +36,24 @@ final class MetadataBuilderTest extends TestCase
         $this->assertStringContainsString('EntitySet Name="Employees"', $xml);
         $this->assertStringContainsString('EntityType="WPDev.PhpSpreadsheetOData.Employees"', $xml);
     }
+
+    #[Test]
+    public function it_infers_types_from_later_rows_when_first_row_is_sparse(): void
+    {
+        $spreadsheet = SpreadsheetFactory::fromRows([
+            ['Amount', 'Name'],
+            [null, 'First'],
+            [42, 'Second'],
+        ], 'Sparse');
+
+        $builder = new MetadataBuilder(
+            $spreadsheet,
+            new EntitySetBuilder($spreadsheet)
+        );
+
+        $xml = $builder->build();
+
+        $this->assertStringContainsString('<Property Name="Amount" Type="Edm.Int32" Nullable="true" />', $xml);
+        $this->assertStringContainsString('<Property Name="Name" Type="Edm.String" Nullable="true" />', $xml);
+    }
 }

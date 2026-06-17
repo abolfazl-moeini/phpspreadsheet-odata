@@ -196,4 +196,4 @@ composer phpstan
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+GNU General Public License v2.0 or later — see [LICENSE](LICENSE).

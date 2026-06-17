@@ -6,7 +6,7 @@ Each worksheet becomes an OData entity set. The first row defines property names
 
 ## Requirements
 
-- PHP 7.4+
+- PHP >= 7.4
 - Composer
 
 ## Installation

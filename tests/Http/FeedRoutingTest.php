@@ -116,4 +116,18 @@ final class FeedRoutingTest extends TestCase
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertCount(3, $body['value']);
     }
+
+    /** @test */
+    public function it_lists_feeds_at_root_service_document_for_resolver(): void
+    {
+        $request = new ServerRequest('GET', '/odata');
+        $response = $this->server->handle($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        /** @var array{value: list<array<string, mixed>>} $body */
+        $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertCount(2, $body['value']);
+        $this->assertSame('tenant-a', $body['value'][0]['name']);
+        $this->assertSame('Feed', $body['value'][0]['kind']);
+    }
 }

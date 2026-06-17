@@ -134,15 +134,17 @@ final class ODataServer
                 case Router::ROUTE_METADATA:
                     return $this->metadataResponse($context);
                 case Router::ROUTE_COLLECTION:
+                    $entitySet = EntitySetBuilder::normalizeIdentifier($route['entitySet'] ?? '');
                     return $this->collectionResponse(
                         $context,
-                        $route['entitySet'] ?? '',
+                        $entitySet,
                         $request->getQueryParams()
                     );
                 case Router::ROUTE_ENTITY:
+                    $entitySet = EntitySetBuilder::normalizeIdentifier($route['entitySet'] ?? '');
                     return $this->entityResponse(
                         $context,
-                        $route['entitySet'] ?? '',
+                        $entitySet,
                         $route['key'] ?? 0,
                         $request->getQueryParams()
                     );
@@ -174,14 +176,11 @@ final class ODataServer
             return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
         }
 
-        if ($this->feedResolver instanceof InMemoryFeedResolver) {
-            $formatter = new ResponseFormatter($this->serviceRoot);
-            $body = $formatter->formatFeedServiceDocument($this->feedResolver->listFeedIds());
+        // For resolver-backed usage, list available feeds at the root service document.
+        $formatter = new ResponseFormatter($this->serviceRoot);
+        $body = $formatter->formatFeedServiceDocument($this->feedResolver->listFeedIds());
 
-            return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
-        }
-
-        return $this->notFoundResponse();
+        return new Response(200, ['Content-Type' => 'application/json', 'OData-Version' => '4.0'], $body);
     }
 
     private function metadataResponse(FeedContext $context): ResponseInterface

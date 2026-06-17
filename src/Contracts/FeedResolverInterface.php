@@ -9,4 +9,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 interface FeedResolverInterface
 {
     public function resolve(string $feedId): ?Spreadsheet;
+
+    /**
+     * @return list<string>
+     */
+    public function listFeedIds(): array;
 }

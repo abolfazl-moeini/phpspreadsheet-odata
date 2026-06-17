@@ -55,4 +55,20 @@ final class PdoFeedResolverTest extends TestCase
 
         $this->assertNull($resolver->resolve('missing'));
     }
+
+    /** @test */
+    public function it_lists_feed_ids_from_database(): void
+    {
+        $insert = $this->pdo->prepare('INSERT INTO odata_feeds (feed_id, source_ref) VALUES (?, ?)');
+        $insert->execute(['feed-1', 'ref-a']);
+        $insert->execute(['feed-2', 'ref-b']);
+
+        $resolver = new PdoFeedResolver(
+            $this->pdo,
+            'odata_feeds',
+            fn (string $sourceRef): ?\PhpOffice\PhpSpreadsheet\Spreadsheet => null,
+        );
+
+        $this->assertSame(['feed-1', 'feed-2'], $resolver->listFeedIds());
+    }
 }

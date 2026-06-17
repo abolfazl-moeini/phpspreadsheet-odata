@@ -47,6 +47,26 @@ final class PdoFeedResolver implements FeedResolverInterface
         return ($this->loader)((string) $sourceRef);
     }
 
+    /**
+     * @return list<string>
+     */
+    public function listFeedIds(): array
+    {
+        $sql = sprintf(
+            'SELECT feed_id FROM %s ORDER BY feed_id',
+            $this->quoteTableName($this->tableName)
+        );
+
+        $statement = $this->pdo->query($sql);
+        if ($statement === false) {
+            return [];
+        }
+
+        $rows = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        return $rows !== false ? array_map('strval', $rows) : [];
+    }
+
     public static function createTable(PDO $pdo, string $tableName = 'odata_feeds'): void
     {
         $pdo->exec(sprintf(

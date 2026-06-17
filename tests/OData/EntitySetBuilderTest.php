@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\OData;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\OData\EntitySetBuilder;
 use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
-/**
- * @covers EntitySetBuilder
- */
+#[CoversClass(EntitySetBuilder::class)]
 final class EntitySetBuilderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_maps_worksheet_rows_to_entities_with_row_index_key(): void
     {
         $spreadsheet = SpreadsheetFactory::sample();
@@ -35,7 +35,8 @@ final class EntitySetBuilderTest extends TestCase
             'Age' => 25,
         ], $entities[1]);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_single_entity_by_row_index(): void
     {
         $spreadsheet = SpreadsheetFactory::sample();
@@ -47,7 +48,8 @@ final class EntitySetBuilderTest extends TestCase
         $this->assertSame('Bob', $entity['Name']);
         $this->assertSame(2, $entity['RowIndex']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_null_for_unknown_row_index(): void
     {
         $spreadsheet = SpreadsheetFactory::sample();
@@ -55,7 +57,8 @@ final class EntitySetBuilderTest extends TestCase
 
         $this->assertNull($builder->findByKey('Employees', 99));
     }
-    /** @test */
+
+    #[Test]
     public function it_handles_empty_header_columns_without_data_misalignment(): void
     {
         $spreadsheet = SpreadsheetFactory::fromRows([
@@ -70,7 +73,8 @@ final class EntitySetBuilderTest extends TestCase
         $this->assertSame('Bob', $entities[1]['Name']);
         $this->assertArrayNotHasKey('', $entities[0]);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_calculated_values_for_formulas(): void
     {
         $spreadsheet = SpreadsheetFactory::fromRows([
@@ -85,7 +89,8 @@ final class EntitySetBuilderTest extends TestCase
 
         $this->assertSame(30, $entities[0]['Total']);
     }
-    /** @test */
+
+    #[Test]
     public function it_normalizes_property_names_and_handles_collisions(): void
     {
         $spreadsheet = SpreadsheetFactory::fromRows([
@@ -100,7 +105,8 @@ final class EntitySetBuilderTest extends TestCase
         $this->assertSame('Bob', $entities[0]['First_Name_2']);
         $this->assertSame(30, $entities[0]['_2026_Age']);
     }
-    /** @test */
+
+    #[Test]
     public function it_normalizes_identifiers_via_static_helper(): void
     {
         $this->assertSame('Hello_World', EntitySetBuilder::normalizeIdentifier('Hello World'));

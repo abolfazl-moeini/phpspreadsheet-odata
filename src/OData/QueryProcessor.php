@@ -149,11 +149,13 @@ final class QueryProcessor implements QueryHandlerInterface
     private function matchesAllConditions(array $entity, array $conditions): bool
     {
         foreach ($conditions as $condition) {
-            if (!preg_match(
-                "/^([A-Za-z_][A-Za-z0-9_]*)\s+(eq|ne|gt|lt|ge|le)\s+('(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"|-?\d+(?:\.\d+)?|true|false)$/i",
-                trim($condition),
-                $matches
-            )) {
+            if (
+                !preg_match(
+                    "/^([A-Za-z_][A-Za-z0-9_]*)\s+(eq|ne|gt|lt|ge|le)\s+('(?:\\\\'|[^'])*'|\"(?:\\\\\"|[^\"])*\"|-?\d+(?:\.\d+)?|true|false)$/i",
+                    trim($condition),
+                    $matches
+                )
+            ) {
                 return false;
             }
 

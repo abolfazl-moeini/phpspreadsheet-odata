@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\OData;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\OData\ResponseFormatter;
 
-/**
- * @covers ResponseFormatter
- */
+#[CoversClass(ResponseFormatter::class)]
 final class ResponseFormatterTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_formats_entity_collection_with_odata_context_and_value(): void
     {
         $formatter = new ResponseFormatter('http://localhost/odata');
@@ -28,10 +28,10 @@ final class ResponseFormatterTest extends TestCase
         $decoded = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame('http://localhost/odata/$metadata#Employees', $decoded['@odata.context']);
-
         $this->assertSame('Alice', $decoded['value'][0]['Name']);
     }
-    /** @test */
+
+    #[Test]
     public function it_includes_count_in_collection_when_provided(): void
     {
         $formatter = new ResponseFormatter('http://localhost/odata');
@@ -42,7 +42,8 @@ final class ResponseFormatterTest extends TestCase
 
         $this->assertSame(5, $decoded['@odata.count']);
     }
-    /** @test */
+
+    #[Test]
     public function it_formats_single_entity_with_context(): void
     {
         $formatter = new ResponseFormatter('http://localhost/odata');
@@ -55,7 +56,8 @@ final class ResponseFormatterTest extends TestCase
         $this->assertSame('Alice', $decoded['Name']);
         $this->assertArrayNotHasKey('value', $decoded);
     }
-    /** @test */
+
+    #[Test]
     public function it_formats_service_document(): void
     {
         $formatter = new ResponseFormatter('http://localhost/odata');

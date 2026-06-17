@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace WPDev\PhpSpreadsheetOData\Tests\Http;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Http\Router;
 use WPDev\PhpSpreadsheetOData\OData\ODataServer;
 use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
-/**
- * @covers Router
- */
+#[CoversClass(Router::class)]
 final class RouterTest extends TestCase
 {
     private ODataServer $server;
@@ -21,7 +21,8 @@ final class RouterTest extends TestCase
     {
         $this->server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
     }
-    /** @test */
+
+    #[Test]
     public function it_routes_service_document(): void
     {
         $request = new ServerRequest('GET', '/odata');
@@ -33,7 +34,8 @@ final class RouterTest extends TestCase
         $this->assertArrayHasKey('@odata.context', $body);
         $this->assertArrayHasKey('value', $body);
     }
-    /** @test */
+
+    #[Test]
     public function it_routes_metadata_endpoint(): void
     {
         $request = new ServerRequest('GET', '/odata/$metadata');
@@ -44,7 +46,8 @@ final class RouterTest extends TestCase
         $this->assertSame('4.0', $response->getHeaderLine('OData-Version'));
         $this->assertStringContainsString('<edmx:Edmx', (string) $response->getBody());
     }
-    /** @test */
+
+    #[Test]
     public function it_routes_entity_collection(): void
     {
         $request = new ServerRequest('GET', '/odata/Employees');
@@ -56,7 +59,8 @@ final class RouterTest extends TestCase
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertCount(3, $body['value']);
     }
-    /** @test */
+
+    #[Test]
     public function it_routes_single_entity_by_key(): void
     {
         $request = new ServerRequest('GET', '/odata/Employees(2)');
@@ -67,7 +71,8 @@ final class RouterTest extends TestCase
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('Bob', $body['Name']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_404_for_unknown_route(): void
     {
         $request = new ServerRequest('GET', '/odata/UnknownSheet');
@@ -75,7 +80,8 @@ final class RouterTest extends TestCase
 
         $this->assertSame(404, $response->getStatusCode());
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_401_when_authentication_fails(): void
     {
         $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
@@ -86,7 +92,8 @@ final class RouterTest extends TestCase
 
         $this->assertSame(401, $response->getStatusCode());
     }
-    /** @test */
+
+    #[Test]
     public function it_applies_query_options_on_collection(): void
     {
         $request = (new ServerRequest('GET', '/odata/Employees'))
@@ -99,7 +106,8 @@ final class RouterTest extends TestCase
         $this->assertCount(1, $body['value']);
         $this->assertSame('Alice', $body['value'][0]['Name']);
     }
-    /** @test */
+
+    #[Test]
     public function it_rejects_non_get_methods_with_405(): void
     {
         foreach (['POST', 'PUT', 'DELETE', 'PATCH'] as $method) {
@@ -109,7 +117,8 @@ final class RouterTest extends TestCase
             $this->assertSame('GET', $response->getHeaderLine('Allow'));
         }
     }
-    /** @test */
+
+    #[Test]
     public function it_routes_entity_collection_case_insensitively(): void
     {
         $request = new ServerRequest('GET', '/odata/employees');
@@ -120,7 +129,8 @@ final class RouterTest extends TestCase
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertCount(3, $body['value']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_400_bad_request_on_validation_errors(): void
     {
         $request = (new ServerRequest('GET', '/odata/Employees'))

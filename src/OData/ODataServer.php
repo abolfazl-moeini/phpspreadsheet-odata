@@ -106,7 +106,7 @@ final class ODataServer
             $feedId = $route['feedId'] ?? null;
 
             if ($route['type'] === Router::ROUTE_SERVICE_DOCUMENT) {
-                return $this->serviceDocumentResponse($feedId);
+                return $this->serviceDocumentResponse();
             }
 
             $spreadsheet = $this->resolveSpreadsheet($feedId);
@@ -147,12 +147,8 @@ final class ODataServer
         }
     }
 
-    private function serviceDocumentResponse(?string $feedId): ResponseInterface
+    private function serviceDocumentResponse(): ResponseInterface
     {
-        if ($feedId !== null) {
-            return $this->notFoundResponse();
-        }
-
         if ($this->legacySpreadsheet !== null) {
             $context = $this->createFeedContext($this->legacySpreadsheet, null);
             $body = $context->responseFormatter->formatServiceDocument(
@@ -305,6 +301,10 @@ final class ODataServer
         $projected = [];
 
         foreach ($fields as $field) {
+            if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $field)) {
+                throw new \InvalidArgumentException('Invalid $select query syntax.');
+            }
+
             if (array_key_exists($field, $entity)) {
                 $projected[$field] = $entity[$field];
             }

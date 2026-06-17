@@ -6,6 +6,7 @@ namespace WPDev\PhpSpreadsheetOData\Tests\OData;
 
 use GuzzleHttp\Psr7\ServerRequest;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Contracts\FeedResolverInterface;
 use WPDev\PhpSpreadsheetOData\OData\ODataServer;
@@ -13,7 +14,7 @@ use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
 final class ODataServerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_normalizes_trailing_slash_in_service_root(): void
     {
         $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata/');
@@ -26,7 +27,7 @@ final class ODataServerTest extends TestCase
         $this->assertSame('http://localhost/odata/$metadata#Employees', $body['@odata.context']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_500_when_feed_resolver_throws(): void
     {
         $resolver = new class implements FeedResolverInterface {
@@ -52,7 +53,22 @@ final class ODataServerTest extends TestCase
         $this->assertSame('Internal Server Error', $body['error']['message']);
     }
 
-    /** @test */
+    #[Test]
+    public function it_returns_400_for_invalid_select_on_entity_endpoint(): void
+    {
+        $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
+        $request = (new ServerRequest('GET', '/odata/Employees(1)'))
+            ->withQueryParams(['$select' => 'Name,bad!!field']);
+        $response = $server->handle($request);
+
+        $this->assertSame(400, $response->getStatusCode());
+        /** @var array{error: array{code: string, message: string}} $body */
+        $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('400', $body['error']['code']);
+        $this->assertStringContainsString('$select', $body['error']['message']);
+    }
+
+    #[Test]
     public function it_includes_www_authenticate_for_basic_auth_failures(): void
     {
         $server = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');

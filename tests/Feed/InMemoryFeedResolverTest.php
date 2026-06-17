@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\Feed;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Feed\InMemoryFeedResolver;
 use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
-/**
- * @covers InMemoryFeedResolver
- */
+#[CoversClass(InMemoryFeedResolver::class)]
 final class InMemoryFeedResolverTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_resolves_known_feed_id(): void
     {
         $spreadsheet = SpreadsheetFactory::sample();
@@ -21,14 +21,16 @@ final class InMemoryFeedResolverTest extends TestCase
 
         $this->assertSame($spreadsheet, $resolver->resolve('tenant-a'));
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_null_for_unknown_feed_id(): void
     {
         $resolver = new InMemoryFeedResolver(['tenant-a' => SpreadsheetFactory::sample()]);
 
         $this->assertNull($resolver->resolve('missing'));
     }
-    /** @test */
+
+    #[Test]
     public function it_lists_registered_feed_ids(): void
     {
         $resolver = new InMemoryFeedResolver([

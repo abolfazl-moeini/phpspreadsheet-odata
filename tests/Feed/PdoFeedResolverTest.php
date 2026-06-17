@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\Feed;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Feed\PdoFeedResolver;
 use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
-/**
- * @covers PdoFeedResolver
- */
+#[CoversClass(PdoFeedResolver::class)]
 final class PdoFeedResolverTest extends TestCase
 {
     private \PDO $pdo;
@@ -21,7 +21,8 @@ final class PdoFeedResolverTest extends TestCase
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         PdoFeedResolver::createTable($this->pdo);
     }
-    /** @test */
+
+    #[Test]
     public function it_resolves_spreadsheet_from_database_mapping(): void
     {
         $spreadsheet = SpreadsheetFactory::fromRows([
@@ -44,7 +45,8 @@ final class PdoFeedResolverTest extends TestCase
 
         $this->assertSame($spreadsheet, $resolved);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_null_when_feed_id_is_not_in_database(): void
     {
         $resolver = new PdoFeedResolver(
@@ -56,7 +58,7 @@ final class PdoFeedResolverTest extends TestCase
         $this->assertNull($resolver->resolve('missing'));
     }
 
-    /** @test */
+    #[Test]
     public function it_lists_feed_ids_from_database(): void
     {
         $insert = $this->pdo->prepare('INSERT INTO odata_feeds (feed_id, source_ref) VALUES (?, ?)');

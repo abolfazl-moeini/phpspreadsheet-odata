@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\Http;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Http\Router;
 
-/**
- * @covers Router
- */
+#[CoversClass(Router::class)]
 final class RouterFeedIdTest extends TestCase
 {
     private Router $router;
@@ -18,7 +18,8 @@ final class RouterFeedIdTest extends TestCase
     {
         $this->router = new Router('/odata');
     }
-    /** @test */
+
+    #[Test]
     public function it_extracts_feed_id_from_metadata_route(): void
     {
         $route = $this->router->match('/odata/tenant-a/$metadata');
@@ -26,7 +27,8 @@ final class RouterFeedIdTest extends TestCase
         $this->assertSame(Router::ROUTE_METADATA, $route['type']);
         $this->assertSame('tenant-a', $route['feedId']);
     }
-    /** @test */
+
+    #[Test]
     public function it_extracts_feed_id_from_collection_route(): void
     {
         $route = $this->router->match('/odata/tenant-a/Employees');
@@ -35,7 +37,8 @@ final class RouterFeedIdTest extends TestCase
         $this->assertSame('tenant-a', $route['feedId']);
         $this->assertSame('Employees', $route['entitySet']);
     }
-    /** @test */
+
+    #[Test]
     public function it_extracts_feed_id_from_entity_route(): void
     {
         $route = $this->router->match('/odata/tenant-a/Employees(2)');
@@ -45,7 +48,8 @@ final class RouterFeedIdTest extends TestCase
         $this->assertSame('Employees', $route['entitySet']);
         $this->assertSame(2, $route['key']);
     }
-    /** @test */
+
+    #[Test]
     public function it_keeps_phase1_routes_without_feed_id(): void
     {
         $metadata = $this->router->match('/odata/$metadata');
@@ -57,7 +61,8 @@ final class RouterFeedIdTest extends TestCase
         $this->assertNull($entity['feedId'] ?? null);
         $this->assertSame('Employees', $collection['entitySet']);
     }
-    /** @test */
+
+    #[Test]
     public function it_accepts_url_safe_feed_id_characters(): void
     {
         $route = $this->router->match('/odata/tenant_42-beta/$metadata');

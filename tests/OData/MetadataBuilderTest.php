@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace WPDev\PhpSpreadsheetOData\Tests\OData;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\OData\EntitySetBuilder;
 use WPDev\PhpSpreadsheetOData\OData\MetadataBuilder;
 use WPDev\PhpSpreadsheetOData\Tests\Support\SpreadsheetFactory;
 
-/**
- * @covers MetadataBuilder
- */
+#[CoversClass(MetadataBuilder::class)]
 final class MetadataBuilderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_builds_valid_edmx_metadata_with_entity_sets_and_types(): void
     {
         $spreadsheet = SpreadsheetFactory::sample();

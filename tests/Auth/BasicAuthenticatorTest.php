@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace WPDev\PhpSpreadsheetOData\Tests\Auth;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Auth\BasicAuthenticator;
 
-/**
- * @covers BasicAuthenticator
- */
+#[CoversClass(BasicAuthenticator::class)]
 final class BasicAuthenticatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_authenticates_with_valid_basic_credentials(): void
     {
         $authenticator = new BasicAuthenticator(
@@ -25,7 +25,8 @@ final class BasicAuthenticatorTest extends TestCase
 
         $this->assertTrue($authenticator->authenticate($request));
     }
-    /** @test */
+
+    #[Test]
     public function it_rejects_invalid_basic_credentials(): void
     {
         $authenticator = new BasicAuthenticator(
@@ -37,7 +38,8 @@ final class BasicAuthenticatorTest extends TestCase
 
         $this->assertFalse($authenticator->authenticate($request));
     }
-    /** @test */
+
+    #[Test]
     public function it_rejects_missing_authorization_header(): void
     {
         $authenticator = new BasicAuthenticator(

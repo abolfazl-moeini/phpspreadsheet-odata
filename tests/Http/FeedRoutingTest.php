@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WPDev\PhpSpreadsheetOData\Tests\Http;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use WPDev\PhpSpreadsheetOData\Feed\InMemoryFeedResolver;
 use WPDev\PhpSpreadsheetOData\OData\ODataServer;
@@ -35,7 +36,8 @@ final class FeedRoutingTest extends TestCase
 
         $this->server = new ODataServer($resolver, 'http://localhost/odata');
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_404_for_unknown_feed_id(): void
     {
         $request = new ServerRequest('GET', '/odata/unknown/$metadata');
@@ -46,7 +48,8 @@ final class FeedRoutingTest extends TestCase
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('404', $body['error']['code']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_metadata_for_known_feed_id(): void
     {
         $request = new ServerRequest('GET', '/odata/tenant-a/$metadata');
@@ -57,7 +60,8 @@ final class FeedRoutingTest extends TestCase
         $this->assertStringContainsString('EntityType Name="Employees"', $xml);
         $this->assertStringNotContainsString('EntityType Name="Products"', $xml);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_entity_collection_for_known_feed_id(): void
     {
         $request = new ServerRequest('GET', '/odata/tenant-a/Employees');
@@ -70,7 +74,8 @@ final class FeedRoutingTest extends TestCase
         $this->assertSame('Alice', $body['value'][0]['Name']);
         $this->assertSame('http://localhost/odata/tenant-a/$metadata#Employees', $body['@odata.context']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_different_datasets_for_different_feed_ids(): void
     {
         $requestA = new ServerRequest('GET', '/odata/tenant-a/Employees');
@@ -84,7 +89,8 @@ final class FeedRoutingTest extends TestCase
         $this->assertSame('Alice', $bodyA['value'][0]['Name']);
         $this->assertSame('Widget', $bodyB['value'][0]['Title']);
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_401_before_feed_resolution_when_auth_fails(): void
     {
         $this->server->useBearer(fn (string $token): bool => $token === 'secret');
@@ -94,7 +100,8 @@ final class FeedRoutingTest extends TestCase
 
         $this->assertSame(401, $response->getStatusCode());
     }
-    /** @test */
+
+    #[Test]
     public function it_returns_404_with_valid_auth_for_unknown_feed_id(): void
     {
         $this->server->useBearer(fn (string $token): bool => $token === 'secret');
@@ -106,7 +113,8 @@ final class FeedRoutingTest extends TestCase
 
         $this->assertSame(404, $response->getStatusCode());
     }
-    /** @test */
+
+    #[Test]
     public function it_keeps_phase1_routes_working_with_legacy_spreadsheet_constructor(): void
     {
         $legacyServer = new ODataServer(SpreadsheetFactory::sample(), 'http://localhost/odata');
@@ -119,7 +127,7 @@ final class FeedRoutingTest extends TestCase
         $this->assertCount(3, $body['value']);
     }
 
-    /** @test */
+    #[Test]
     public function it_lists_feeds_at_root_service_document_for_resolver(): void
     {
         $request = new ServerRequest('GET', '/odata');

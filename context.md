@@ -6,6 +6,7 @@ This document gives AI agents enough background to work on this codebase without
 
 **Package:** `wpdev/phpspreadsheet-odata`  
 **Namespace:** `WPDev\PhpSpreadsheetOData`  
+**PHP:** **minimum 7.4** — all code in `src/` **must** run on PHP 7.4 and remain compatible with PHP 8.x (`composer.json`: `"php": ">=7.4"`).  
 **Purpose:** Framework-agnostic, read-only **OData v4** HTTP feed over [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) workbooks.
 
 Core idea: pass a `Spreadsheet` (or resolve one per feed) — each worksheet becomes an OData entity set; row 1 is headers; data rows become entities with synthetic key `RowIndex` (1-based, excluding header).
@@ -16,7 +17,7 @@ No framework dependencies (Laravel, Symfony, etc.). Uses **PSR-7** request/respo
 
 | Area | Rule |
 |------|------|
-| PHP | `>=7.4` — **no PHP 8-only syntax** in `src/` (`readonly`, `match`, union types, `mixed` hints, `str_*` polyfills needed) |
+| PHP | **Minimum 7.4, compatible with 7.4+** — hard requirement. Every change must work on PHP 7.4. **No PHP 8-only syntax** in `src/` (`readonly`, `match`, union types, `mixed` hints, attributes, `str_*` without polyfill, `new` in default parameters, catch without variable). CI tests PHP 7.4. |
 | Style | PSR-4 autoloading, PSR-12, `declare(strict_types=1)` |
 | HTTP | PSR-7 only; Guzzle PSR-7 used for responses |
 | Database | Core is **database-agnostic**; optional `PdoFeedResolver` is an example only |
@@ -177,19 +178,36 @@ tests/
 └── OData/          — MetadataBuilder, EntitySetBuilder, QueryProcessor, ResponseFormatter
 ```
 
-## PHP 7.4 compatibility notes
+## PHP 7.4+ compatibility (mandatory)
+
+**This package targets PHP 7.4 as the floor.** Do not merge code that requires PHP 8.0 or later unless the project explicitly raises the minimum version.
+
+Before finishing any task, verify:
+
+1. No PHP 8+ syntax in `src/` (see banned list below).
+2. `composer test` passes locally.
+3. New APIs work with PhpSpreadsheet `^1.29` (the 1.x line is required for PHP 7.4 hosts).
+
+**Required patterns:**
 
 - Use `WPDev\PhpSpreadsheetOData\Support\Str` instead of `str_starts_with` / `str_ends_with` / `str_contains`
-- Use `WorksheetCells::getCell()` / `setValue()` instead of direct coordinate APIs
-- Avoid `readonly`, `match`, union types, `mixed` type hints in `src/`
-- Use `switch` instead of `match`; explicit properties instead of constructor promotion with `readonly`
-- PhpSpreadsheet: supports `^1.29` through `^5.0`
+- Use `WorksheetCells::getCell()` / `setValue()` instead of direct coordinate APIs (shim for PhpSpreadsheet 1.x and 2+)
+- Use `switch` instead of `match`
+- Use explicit class properties set in the constructor instead of `readonly` or promoted `readonly` properties
+- Use docblock `@param mixed` instead of `mixed` type hints where needed
+- Use `catch (\Throwable $e)` — never catch without a variable (PHP 8+ only)
+- Use `($obj instanceof Foo) ? ... : ...` or separate checks instead of union types (`Foo|Bar`)
+
+**Banned in `src/` (PHP 8+):** `readonly`, `match`, union types, `mixed` hints, attributes (`#[...]`), `str_starts_with` / `str_ends_with` / `str_contains`, `\Stringable`, `new Class()` as default parameter values, nullsafe operator `?->`, named arguments requirement.
+
+**PhpSpreadsheet:** `^1.29|^2.0|^3.0|^4.0|^5.0` — use `^1.29` when testing on PHP 7.4.
 
 ## Extension guidelines for agents
 
 **Do:**
 
 - Keep changes focused; match existing naming and patterns
+- **Write all `src/` code to be PHP 7.4-compatible** — test mentally against 7.4 before committing
 - Maintain backward compatibility for Phase 1 routes (spreadsheet constructor)
 - Keep core free of framework/DB dependencies
 - Add PHPUnit tests for new behavior
@@ -200,7 +218,8 @@ tests/
 - Add write operations (POST/PATCH/DELETE) unless explicitly requested
 - Require a database in core
 - Break `feedId`-optional routing for legacy single-spreadsheet usage
-- Introduce PHP 8+ syntax in `src/` without explicit approval
+- **Introduce PHP 8+ syntax or dependencies that require PHP 8+** in `src/` — this breaks the minimum PHP 7.4 guarantee
+- Bump `composer.json` `"php"` constraint below `>=7.4` without explicit user approval
 - Redefine data separately from PhpSpreadsheet — always read from workbook structure
 
 ## Key files for common tasks

@@ -64,7 +64,7 @@ final class FeedRoutingTest extends TestCase
         $response = $this->server->handle($request);
 
         $this->assertSame(200, $response->getStatusCode());
-        /** @var array{value: list<array<string, mixed>>, @odata.context: string} $body */
+        /** @var array{value: list<array<string, mixed>>, '@odata.context': string} $body */
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertCount(2, $body['value']);
         $this->assertSame('Alice', $body['value'][0]['Name']);
@@ -76,7 +76,9 @@ final class FeedRoutingTest extends TestCase
         $requestA = new ServerRequest('GET', '/odata/tenant-a/Employees');
         $requestB = new ServerRequest('GET', '/odata/tenant-b/Products');
 
+        /** @var array{value: list<array<string, mixed>>} $bodyA */
         $bodyA = json_decode((string) $this->server->handle($requestA)->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        /** @var array{value: list<array<string, mixed>>} $bodyB */
         $bodyB = json_decode((string) $this->server->handle($requestB)->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame('Alice', $bodyA['value'][0]['Name']);

@@ -21,7 +21,7 @@ final class ODataServerTest extends TestCase
         $response = $server->handle($request);
 
         $this->assertSame(200, $response->getStatusCode());
-        /** @var array{@odata.context: string} $body */
+        /** @var array{'@odata.context': string} $body */
         $body = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('http://localhost/odata/$metadata#Employees', $body['@odata.context']);
     }

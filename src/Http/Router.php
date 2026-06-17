@@ -23,24 +23,36 @@ final class Router
     }
 
     /**
-     * @return array{type: string, feedId?: string|null, entitySet?: string, key?: int}
+     * @return array{type: string, feedId: string|null, entitySet: string|null, key: int|null}
      */
     public function match(string $requestPath): array
     {
         $relativePath = $this->resolveRelativePath($requestPath);
 
         if ($relativePath === '' || $relativePath === '/') {
-            return ['type' => self::ROUTE_SERVICE_DOCUMENT];
+            return [
+                'type' => self::ROUTE_SERVICE_DOCUMENT,
+                'feedId' => null,
+                'entitySet' => null,
+                'key' => null,
+            ];
         }
 
         if ($relativePath === '/$metadata') {
-            return ['type' => self::ROUTE_METADATA, 'feedId' => null];
+            return [
+                'type' => self::ROUTE_METADATA,
+                'feedId' => null,
+                'entitySet' => null,
+                'key' => null,
+            ];
         }
 
         if (preg_match('#^/([A-Za-z0-9_-]+)/\$metadata$#', $relativePath, $matches)) {
             return [
                 'type' => self::ROUTE_METADATA,
                 'feedId' => $matches[1],
+                'entitySet' => null,
+                'key' => null,
             ];
         }
 
@@ -58,6 +70,7 @@ final class Router
                 'type' => self::ROUTE_COLLECTION,
                 'feedId' => $matches[1],
                 'entitySet' => rawurldecode($matches[2]),
+                'key' => null,
             ];
         }
 
@@ -75,10 +88,16 @@ final class Router
                 'type' => self::ROUTE_COLLECTION,
                 'feedId' => null,
                 'entitySet' => rawurldecode($matches[1]),
+                'key' => null,
             ];
         }
 
-        return ['type' => self::ROUTE_NOT_FOUND];
+        return [
+            'type' => self::ROUTE_NOT_FOUND,
+            'feedId' => null,
+            'entitySet' => null,
+            'key' => null,
+        ];
     }
 
     private function resolveRelativePath(string $requestPath): string

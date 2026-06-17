@@ -47,9 +47,7 @@
         "phpcs": "phpcs --standard=phpcs.xml"
     },
     "config": {
-        "sort-packages": true,
-        "platform": {
-        }
+        "sort-packages": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true
